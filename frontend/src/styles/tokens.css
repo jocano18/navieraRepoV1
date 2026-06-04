@@ -1,0 +1,38 @@
+/**
+ * Naviera brand tokens — single source of truth.
+ * See design-tokens.md for usage guidelines.
+ */
+:root {
+  /* Primary palette */
+  --color-primary-900: #270045;
+  --color-primary-800: #3d0a66;
+  --color-primary-700: #521a7d;
+  --color-accent-500: #f54d02;
+  --color-accent-600: #d94302;
+  --color-accent-700: #b83801;
+  --color-lilac-300: #c3b6d2;
+  --color-lilac-200: #ddd6e6;
+  --color-lilac-100: #f0ecf4;
+  --color-cream-100: #fcfcbe;
+
+  /* Secondary palette */
+  --color-violet-500: #8c5be8;
+  --color-violet-600: #7048c4;
+  --color-coral-400: #fc6844;
+  --color-blue-600: #002be8;
+
+  /* Semantic */
+  --color-success-600: #1a7a52;
+  --color-success-100: #e6f5ef;
+  --color-surface: #ffffff;
+  --color-surface-muted: var(--color-lilac-100);
+  --color-border: var(--color-lilac-300);
+  --color-text: var(--color-primary-900);
+  --color-text-muted: #5c4d6b;
+  --color-focus-ring: var(--color-blue-600);
+
+  /* Layout */
+  --radius-card: 0.75rem;
+  --shadow-soft: 0 4px 24px -4px rgb(39 0 69 / 0.08);
+  --shadow-elevated: 0 12px 40px -8px rgb(39 0 69 / 0.12);
+}

@@ -1,0 +1,52 @@
+@import 'tailwindcss';
+@import './tokens.css';
+@import '@fontsource/plus-jakarta-sans/400.css';
+@import '@fontsource/plus-jakarta-sans/500.css';
+@import '@fontsource/plus-jakarta-sans/600.css';
+@import '@fontsource/plus-jakarta-sans/700.css';
+@import '@fontsource/plus-jakarta-sans/800.css';
+
+@theme {
+  --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+
+  --color-brand: var(--color-primary-900);
+  --color-brand-muted: var(--color-primary-800);
+  --color-accent: var(--color-accent-500);
+  --color-accent-hover: var(--color-accent-600);
+  --color-lilac: var(--color-lilac-300);
+  --color-lilac-soft: var(--color-lilac-100);
+  --color-cream: var(--color-cream-100);
+  --color-violet: var(--color-violet-500);
+  --color-coral: var(--color-coral-400);
+  --color-blue-focus: var(--color-blue-600);
+  --color-success: var(--color-success-600);
+  --color-success-soft: var(--color-success-100);
+  --color-surface: var(--color-surface);
+  --color-surface-muted: var(--color-surface-muted);
+  --color-border: var(--color-border);
+  --color-text: var(--color-text);
+  --color-text-muted: var(--color-text-muted);
+
+  --radius-card: var(--radius-card);
+  --shadow-soft: var(--shadow-soft);
+  --shadow-elevated: var(--shadow-elevated);
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    color: var(--color-text);
+    background: var(--color-surface-muted);
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  *:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+}

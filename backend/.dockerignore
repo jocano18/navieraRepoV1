@@ -1,0 +1,20 @@
+# Cachés y artefactos locales (evitan errores de build en NAS/Windows)
+.venv
+venv
+__pycache__
+*.py[cod]
+.pytest_cache
+pytest-cache-files-*
+.mypy_cache
+.ruff_cache
+htmlcov
+.coverage
+*.egg-info
+dist
+build
+.git
+
+# Datos locales (se montan por volumen en compose)
+data/*.db
+data/*.db-journal
+storage

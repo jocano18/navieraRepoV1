@@ -1,0 +1,107 @@
+# Naviera Docs — Docker Compose
+# En Windows + proyecto en NAS (UNC), NO usar bind mounts: Docker no acepta \\servidor\...
+# Los PDFs del inbox se copian con:  .\scripts\sync-inbox.ps1
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: naviera-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: naviera
+      POSTGRES_USER: naviera
+      POSTGRES_PASSWORD: naviera_secret_change_me
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U naviera -d naviera"]
+      interval: 3s
+      timeout: 3s
+      retries: 15
+      start_period: 5s
+
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    container_name: naviera-mailhog
+    restart: unless-stopped
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development
+    container_name: naviera-backend
+    restart: unless-stopped
+    environment:
+      APP_NAME: naviera-docs
+      APP_ENV: development
+      DEBUG: "true"
+      LOG_LEVEL: INFO
+      DATABASE_URL: postgresql+asyncpg://naviera:naviera_secret_change_me@postgres:5432/naviera
+      DATABASE_URL_SYNC: postgresql://naviera:naviera_secret_change_me@postgres:5432/naviera
+      INBOX_PATH: /app/data/inbox
+      STORAGE_LOCAL_PATH: /app/storage
+      USE_CONSOLE_NOTIFIER: "false"
+      SMTP_HOST: mailhog
+      SMTP_PORT: "1025"
+      SMTP_FROM: noreply@naviera.local
+      SMTP_USE_TLS: "false"
+      CORS_ORIGINS: http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000
+    ports:
+      - "8000:8000"
+    volumes:
+      - backend_storage:/app/storage
+      - inbox_data:/app/data/inbox
+      - backend_data:/app/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mailhog:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 15s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: development
+    container_name: naviera-frontend
+    restart: unless-stopped
+    environment:
+      # Proxy en Vite (vite.config.ts) usa el hostname de red Docker, no localhost del contenedor.
+      VITE_PROXY_TARGET: http://backend:8000
+      VITE_API_URL: http://localhost:8000
+      VITE_API_BASE_URL: http://localhost:8000
+      VITE_APP_TITLE: Naviera Docs
+    ports:
+      - "5173:5173"
+    volumes:
+      - frontend_node_modules:/app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+      backend:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:5173/"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+volumes:
+  postgres_data:
+  backend_storage:
+  backend_data:
+  inbox_data:
+  frontend_node_modules:

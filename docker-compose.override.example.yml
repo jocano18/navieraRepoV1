@@ -1,0 +1,12 @@
+# Copiar a docker-compose.override.yml SOLO si el proyecto está en disco local (ej. C:\dev\navieraV2)
+# NO usar en rutas UNC (\\NAS\...) — Docker Desktop en Windows falla con bind mounts de red.
+
+services:
+  backend:
+    volumes:
+      - ./backend:/app
+      - ./backend/data/inbox:/app/data/inbox
+
+  frontend:
+    volumes:
+      - ./frontend:/app
