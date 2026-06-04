@@ -20,12 +20,6 @@ make check   # comprueba que el API responde
 **Windows sin Make** — desde la raíz del proyecto (`navieraV2`, donde está `docker-compose.yml`):
 
 ```powershell
-# Recomendado en NAS (ruta \\servidor\...): PowerShell nativo
-.\naviera.ps1 up
-.\naviera.ps1 sync
-.\naviera.ps1 check
-
-# Alternativa: el .bat debe llevar .\ delante
 .\make.bat up
 .\make.bat sync
 ```
