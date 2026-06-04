@@ -7,11 +7,12 @@ COMPOSE := docker compose
 BACKEND := $(COMPOSE) exec backend
 
 # Windows: sync vía .bat (pushd para rutas UNC del NAS)
+# Linux/macOS: scripts/sync-inbox.sh
 ifeq ($(OS),Windows_NT)
   SYNC_INBOX := cmd /c scripts\sync-inbox.bat
   CHECK_API := cmd /c scripts\check-api.bat
 else
-  SYNC_INBOX := powershell -ExecutionPolicy Bypass -File scripts/sync-inbox.ps1
+  SYNC_INBOX := bash scripts/sync-inbox.sh
   CHECK_API := curl -sf http://localhost:8000/health && curl -sf http://localhost:8000/inbox/pdfs | head -c 200
 endif
 
