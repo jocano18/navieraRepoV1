@@ -30,54 +30,37 @@ make check   # comprueba que el API responde
 .\make.bat sync
 ```
 
-**Importante:** no uses `make up` ni `make.bat up` sin el `.\`. En rutas UNC del NAS, si `make.bat` falla con "no configuration file provided", usa **`.\naviera.ps1`**.
+Service URLs
 
-Abre http://localhost:5173 (Ctrl+F5 tras un rebuild).
-
-Tras el build, **frontend (5173) y backend (8000)** arrancan en cuanto Postgres está listo.
-
-### Windows + proyecto en NAS (`\\servidor\...`)
-
-Docker Desktop **no puede montar** carpetas UNC. El `docker-compose.yml` usa volúmenes nombrados.
-
-1. `make up` o `make.bat up`
-2. `make sync` o `make.bat sync` — usa `pushd` para rutas `\\servidor\...`
-
-En el **primer arranque**, el backend también copia PDFs embebidos en la imagen si el volumen inbox está vacío. Vuelve a ejecutar **sync** cuando agregues PDFs nuevos en `backend/data/inbox`.
-
-Si el proyecto está en disco local (`C:\...`), puedes activar hot-reload con `docker-compose.override.example.yml` → `docker-compose.override.yml`.
-
-### Service URLs
-
-| Service | URL |
-|---------|-----|
-| Frontend | http://localhost:5173 |
-| Backend API | http://localhost:8000 |
-| API docs (dev) | http://localhost:8000/docs |
-| Health check | http://localhost:8000/health |
-| MailHog UI | http://localhost:8025 |
-| PostgreSQL | localhost:5432 |
+| Service        | URL                          |
+| -------------- | ---------------------------- |
+| Frontend       | http://localhost:5173        |
+| Backend API    | http://localhost:8000        |
+| API docs (dev) | http://localhost:8000/docs   |
+| Health check   | http://localhost:8000/health |
+| MailHog UI     | http://localhost:8025        |
+| PostgreSQL     | localhost:5432               |
 
 ## Comandos (`make` o `make.bat`)
 
-| Comando | Qué hace |
-|---------|----------|
-| `make help` | Lista todos los comandos |
-| `make up` | Build + levanta todo en segundo plano |
-| `make down` | Para y quita contenedores |
-| `make restart` | `down` + `up` |
-| `make rebuild` | Reconstruye imágenes y recrea contenedores |
-| `make sync` | Sincroniza PDFs (`backend/data/inbox` → Docker) |
-| `make status` | `docker compose ps` |
-| `make check` | Health + inbox + prueba crear envío |
-| `make logs` | Logs de backend y frontend |
-| `make build` | Solo construye imágenes |
-| `make install` | venv + npm en el host (opcional, para IDE) |
-| `make test` | `pytest` en el contenedor backend |
-| `make migrate` | `alembic upgrade head` |
-| `make clean` | Limpia cachés Python |
-| `make down-v` | Baja todo **y borra volúmenes** (reset BD/inbox) |
-| `make up-fg` | Levanta en primer plano (logs en la misma ventana) |
+| Comando          | Qué hace                                              |
+| ---------------- | ------------------------------------------------------ |
+| `make help`    | Lista todos los comandos                               |
+| `make up`      | Build + levanta todo en segundo plano                  |
+| `make down`    | Para y quita contenedores                              |
+| `make restart` | `down` + `up`                                      |
+| `make rebuild` | Reconstruye imágenes y recrea contenedores            |
+| `make sync`    | Sincroniza PDFs (`backend/data/inbox` → Docker)     |
+| `make status`  | `docker compose ps`                                  |
+| `make check`   | Health + inbox + prueba crear envío                   |
+| `make logs`    | Logs de backend y frontend                             |
+| `make build`   | Solo construye imágenes                               |
+| `make install` | venv + npm en el host (opcional, para IDE)             |
+| `make test`    | `pytest` en el contenedor backend                    |
+| `make migrate` | `alembic upgrade head`                               |
+| `make clean`   | Limpia cachés Python                                  |
+| `make down-v`  | Baja todo**y borra volúmenes** (reset BD/inbox) |
+| `make up-fg`   | Levanta en primer plano (logs en la misma ventana)     |
 
 ## Project structure
 
