@@ -9,6 +9,8 @@ from app.application.ports.notifier import Notifier
 from app.application.ports.shipment_repository import ShipmentRepository
 from app.domain.exceptions import ClientNotFoundError, ShipmentNotFoundError
 from app.domain.value_objects.shipment_status import ShipmentStatus
+from app.infrastructure.notifications.approval_token import ApprovalTokenService
+from app.infrastructure.notifications.email_templates import build_approval_email
 
 
 class ApproveShipmentUseCase:
@@ -21,12 +23,14 @@ class ApproveShipmentUseCase:
         notifier: Notifier,
         file_storage: FileStorage,
         event_publisher: EventPublisher,
+        approval_tokens: ApprovalTokenService,
     ) -> None:
         self._shipment_repo = shipment_repo
         self._client_repo = client_repo
         self._notifier = notifier
         self._file_storage = file_storage
         self._event_publisher = event_publisher
+        self._approval_tokens = approval_tokens
 
     async def execute(self, shipment_id: UUID) -> None:
         """Approve and send notification with PDF attached."""
@@ -46,15 +50,18 @@ class ApproveShipmentUseCase:
 
         shipment.approve_and_notify()
         pdf_path = await self._file_storage.get_pdf_path(shipment_id)
+        approval_url = self._approval_tokens.build_approval_url(shipment_id)
+        plain, html = build_approval_email(
+            client_name=client.name,
+            reference=shipment.reference,
+            approval_url=approval_url,
+        )
 
         await self._notifier.notify(
             client.email,
             subject=f"Documentación lista — {shipment.reference}",
-            body=(
-                f"Estimado {client.name},\n\n"
-                f"La documentación del embarque {shipment.reference} "
-                "ha sido validada y está lista para su revisión.\n"
-            ),
+            body=plain,
+            html_body=html,
             attachment_path=pdf_path,
             shipment_id=shipment_id,
         )

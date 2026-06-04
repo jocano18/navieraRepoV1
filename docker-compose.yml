@@ -51,6 +51,8 @@ services:
       SMTP_PORT: "1025"
       SMTP_FROM: noreply@naviera.local
       SMTP_USE_TLS: "false"
+      PUBLIC_API_URL: http://localhost:8000
+      APPROVAL_TOKEN_SECRET: naviera-dev-approval-secret-change-me
       CORS_ORIGINS: http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000
     ports:
       - "8000:8000"

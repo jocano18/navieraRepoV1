@@ -27,15 +27,23 @@ class EmailNotifier(Notifier):
         subject: str,
         body: str,
         *,
+        html_body: str | None = None,
         attachment_path: Path | None = None,
         shipment_id: UUID | None = None,
     ) -> None:
-        """Send email with optional PDF attachment."""
-        message = MIMEMultipart()
+        """Send email with optional HTML body and PDF attachment."""
+        message = MIMEMultipart("mixed")
         message["From"] = self._settings.smtp_from
         message["To"] = recipient_email
         message["Subject"] = subject
-        message.attach(MIMEText(body, "plain", "utf-8"))
+
+        if html_body:
+            alternative = MIMEMultipart("alternative")
+            alternative.attach(MIMEText(body, "plain", "utf-8"))
+            alternative.attach(MIMEText(html_body, "html", "utf-8"))
+            message.attach(alternative)
+        else:
+            message.attach(MIMEText(body, "plain", "utf-8"))
 
         if attachment_path and attachment_path.exists():
             pdf_bytes = attachment_path.read_bytes()

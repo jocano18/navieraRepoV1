@@ -14,6 +14,7 @@ from app.application.ports.notifier import Notifier
 from app.application.ports.pdf_extractor import PdfExtractor
 from app.application.ports.shipment_repository import ShipmentRepository
 from app.application.use_cases.approve_shipment import ApproveShipmentUseCase
+from app.application.use_cases.approve_via_email_link import ApproveViaEmailLinkUseCase
 from app.application.use_cases.compare_data import CompareDataUseCase
 from app.application.use_cases.create_shipment import CreateShipmentUseCase
 from app.application.use_cases.extract_pdf_data import ExtractPdfDataUseCase
@@ -22,6 +23,7 @@ from app.application.use_cases.validate_and_transition import (
     ValidateAndTransitionUseCase,
 )
 from app.infrastructure.config.settings import Settings, get_settings
+from app.infrastructure.notifications.approval_token import ApprovalTokenService
 from app.infrastructure.notifications.console_notifier import ConsoleNotifier
 from app.infrastructure.notifications.email_notifier import EmailNotifier
 from app.infrastructure.notifications.event_publisher import LoggingEventPublisher
@@ -61,6 +63,13 @@ def get_pdf_extractor() -> PdfExtractor:
         text_extractor=PdfPlumberTextExtractor(),
         ocr_engine=TesseractOcrEngine(),
     )
+
+
+def get_approval_tokens(
+    settings: Annotated[Settings, Depends(get_settings)],
+) -> ApprovalTokenService:
+    """Signed tokens for email approval links."""
+    return ApprovalTokenService(settings)
 
 
 def get_notifier(
@@ -137,6 +146,17 @@ def get_approve(
     notifier: Annotated[Notifier, Depends(get_notifier)],
     storage: Annotated[FileStorage, Depends(get_file_storage)],
     publisher: Annotated[EventPublisher, Depends(get_event_publisher)],
+    approval_tokens: Annotated[ApprovalTokenService, Depends(get_approval_tokens)],
 ) -> ApproveShipmentUseCase:
     """Approve and notify use case."""
-    return ApproveShipmentUseCase(repo, client_repo, notifier, storage, publisher)
+    return ApproveShipmentUseCase(
+        repo, client_repo, notifier, storage, publisher, approval_tokens
+    )
+
+
+def get_approve_via_email(
+    repo: Annotated[ShipmentRepository, Depends(get_shipment_repo)],
+    approval_tokens: Annotated[ApprovalTokenService, Depends(get_approval_tokens)],
+) -> ApproveViaEmailLinkUseCase:
+    """Email link approval use case."""
+    return ApproveViaEmailLinkUseCase(repo, approval_tokens)

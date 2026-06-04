@@ -15,6 +15,7 @@ class Notifier(ABC):
         subject: str,
         body: str,
         *,
+        html_body: str | None = None,
         attachment_path: Path | None = None,
         shipment_id: UUID | None = None,
     ) -> None:

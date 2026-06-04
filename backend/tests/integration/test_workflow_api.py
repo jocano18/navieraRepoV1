@@ -1,8 +1,12 @@
 """Integration tests — full API happy path and INCOMPLETO loop."""
 
+from uuid import UUID
+
 import pytest
 from httpx import AsyncClient
 
+from app.infrastructure.config.settings import get_settings
+from app.infrastructure.notifications.approval_token import ApprovalTokenService
 from app.infrastructure.persistence.seed import DEFAULT_CLIENT_ID
 
 
@@ -76,11 +80,47 @@ async def test_full_happy_path(client: AsyncClient) -> None:
     approve = await client.post(f"/shipments/{shipment_id}/approve")
     assert approve.status_code == 204
 
-    capprove = await client.post(f"/shipments/{shipment_id}/client-approve")
-    assert capprove.status_code == 204
+    token_service = ApprovalTokenService(get_settings())
+    token = token_service.create(UUID(shipment_id))
+    link = await client.get(f"/public/approve?token={token}")
+    assert link.status_code == 200
+    assert "Documentación aprobada" in link.text
 
-    finalize = await client.post(f"/shipments/{shipment_id}/finalize")
-    assert finalize.status_code == 204
+    detail = await client.get(f"/shipments/{shipment_id}")
+    assert detail.json()["status"] == "FINALIZADO"
+
+
+@pytest.mark.asyncio
+async def test_email_approval_link_idempotent(client: AsyncClient) -> None:
+    """Second click on approval link still returns success when FINALIZADO."""
+    client_id = str(DEFAULT_CLIENT_ID)
+    create = await client.post(
+        "/shipments",
+        json={
+            "source_pdf_filename": "test.pdf",
+            "cargo_type": "DIRECTO",
+            "client_id": client_id,
+            "reference": "REF-LINK-2",
+        },
+    )
+    shipment_id = create.json()["id"]
+    extract = await client.post(f"/shipments/{shipment_id}/extract")
+    reg = await client.post(
+        f"/shipments/{shipment_id}/digitized-data",
+        json=_digitized_payload(extract.json()["data"]),
+    )
+    assert reg.status_code == 204
+    await client.post(
+        f"/shipments/{shipment_id}/validate",
+        json={"mark_complete": True},
+    )
+    await client.post(f"/shipments/{shipment_id}/approve")
+
+    token = ApprovalTokenService(get_settings()).create(UUID(shipment_id))
+    first = await client.get(f"/public/approve?token={token}")
+    second = await client.get(f"/public/approve?token={token}")
+    assert first.status_code == 200
+    assert second.status_code == 200
 
     detail = await client.get(f"/shipments/{shipment_id}")
     assert detail.json()["status"] == "FINALIZADO"

@@ -18,15 +18,17 @@ class ConsoleNotifier(Notifier):
         subject: str,
         body: str,
         *,
+        html_body: str | None = None,
         attachment_path: Path | None = None,
         shipment_id: UUID | None = None,
     ) -> None:
         """Log notification instead of sending SMTP."""
         logger.info(
-            "NOTIFY to=%s subject=%s shipment=%s attachment=%s\n%s",
+            "NOTIFY to=%s subject=%s shipment=%s attachment=%s\n%s\n%s",
             recipient_email,
             subject,
             shipment_id,
             attachment_path,
             body,
+            html_body or "",
         )

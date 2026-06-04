@@ -72,8 +72,9 @@ No use case or API changes required (Open/Closed).
 | GET | `/shipments/{id}/comparison` | Field diff |
 | PATCH | `/shipments/{id}/digitized-data` | Correct data |
 | POST | `/shipments/{id}/validate` | Executive validation |
-| POST | `/shipments/{id}/approve` | Notify client |
-| POST | `/shipments/{id}/client-approve` | Client approval |
+| POST | `/shipments/{id}/approve` | Notify client (email includes approve button) |
+| GET | `/public/approve?token=…` | Client email link → approve + finalize |
+| POST | `/shipments/{id}/client-approve` | Client approval (manual / API) |
 | POST | `/shipments/{id}/finalize` | Finalize |
 | POST | `/shipments/{id}/novelty` | Register novelty |
 
@@ -86,6 +87,9 @@ No use case or API changes required (Open/Closed).
 | `STORAGE_LOCAL_PATH` | `./storage` | Stored shipment PDFs |
 | `USE_CONSOLE_NOTIFIER` | `true` | Log emails instead of SMTP |
 | `SMTP_HOST` | `mailhog` | SMTP when console notifier disabled |
+| `PUBLIC_API_URL` | `http://localhost:8000` | Base URL for approve button in emails |
+| `APPROVAL_TOKEN_SECRET` | (dev default) | HMAC secret for email approval links |
+| `APPROVAL_TOKEN_MAX_AGE_DAYS` | `7` | Link expiration |
 
 ## Project layout
 

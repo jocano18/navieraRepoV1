@@ -68,6 +68,8 @@ async def client(
     monkeypatch.setenv("INBOX_PATH", str(inbox_dir))
     monkeypatch.setenv("STORAGE_LOCAL_PATH", str(tmp_path / "storage"))
     monkeypatch.setenv("USE_CONSOLE_NOTIFIER", "true")
+    monkeypatch.setenv("PUBLIC_API_URL", "http://test")
+    monkeypatch.setenv("APPROVAL_TOKEN_SECRET", "test-secret")
     settings_mod.get_settings.cache_clear()
 
     engine = create_async_engine(TEST_DB_URL, connect_args={"check_same_thread": False})
@@ -86,7 +88,8 @@ async def client(
     fake_storage = FakeFileStorage()
     app.dependency_overrides[deps.get_pdf_extractor] = lambda: fake_extractor
     app.dependency_overrides[deps.get_inbox] = lambda: FakeInboxStorage(
-        {"test.pdf": pdf_path.read_bytes()}
+        {"test.pdf": pdf_path.read_bytes()},
+        base_dir=inbox_dir,
     )
     app.dependency_overrides[deps.get_file_storage] = lambda: fake_storage
 

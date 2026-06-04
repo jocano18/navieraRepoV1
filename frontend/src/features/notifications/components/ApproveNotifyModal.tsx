@@ -51,7 +51,8 @@ export function ApproveNotifyModal({
         </div>
       </div>
       <p className="mt-4 text-xs text-text-muted">
-        Al confirmar, el envío pasará a estado NOTIFICADO y se disparará el correo al cliente.
+        Al confirmar, el envío pasará a NOTIFICADO y el cliente recibirá un correo con botón
+        para aprobar la documentación (cierra el flujo en FINALIZADO).
       </p>
     </Modal>
   );

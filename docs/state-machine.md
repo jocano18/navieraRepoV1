@@ -28,8 +28,9 @@ The shipment documentation workflow is modeled as a **finite state machine**. Ea
 | `EN_VALIDACION` | `INCOMPLETO` | `CompareData` finds discrepancies |
 | `EN_VALIDACION` | `COMPLETO` | `CompareData` passes |
 | `INCOMPLETO` | `EN_DIGITACION` | `CorrectData` — operator fixes fields |
-| `COMPLETO` | `NOTIFICADO` | `NotifyClient` succeeds |
-| `NOTIFICADO` | `APROBADO_CLIENTE` | `ApproveShipment` by client |
+| `COMPLETO` | `NOTIFICADO` | Executive `approve` + email to client |
+| `NOTIFICADO` | `APROBADO_CLIENTE` | Client clicks email link (`GET /public/approve`) or `client-approve` API |
+| `APROBADO_CLIENTE` | `FINALIZADO` | Automatic on email link; or `finalize` API |
 | `NOTIFICADO` | `CON_NOVEDAD` | `RegisterNovelty` |
 | `APROBADO_CLIENTE` | `FINALIZADO` | Final closure |
 | `CON_NOVEDAD` | `EN_DIGITACION` | Novelty resolved, re-digitization |

@@ -32,3 +32,7 @@ class ValidationIncompleteError(DomainError):
 
 class InboxFileNotFoundError(DomainError):
     """Raised when a requested inbox PDF does not exist."""
+
+
+class InvalidApprovalTokenError(DomainError):
+    """Raised when an email approval link token is invalid or expired."""

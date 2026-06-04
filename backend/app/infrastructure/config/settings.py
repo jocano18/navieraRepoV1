@@ -70,6 +70,19 @@ class Settings(BaseSettings):
     smtp_from: str = Field(default="noreply@naviera.local", alias="SMTP_FROM")
     smtp_use_tls: bool = Field(default=False, alias="SMTP_USE_TLS")
 
+    public_api_url: str = Field(
+        default="http://localhost:8000",
+        alias="PUBLIC_API_URL",
+    )
+    approval_token_secret: str = Field(
+        default="naviera-dev-approval-secret-change-me",
+        alias="APPROVAL_TOKEN_SECRET",
+    )
+    approval_token_max_age_days: int = Field(
+        default=7,
+        alias="APPROVAL_TOKEN_MAX_AGE_DAYS",
+    )
+
     storage_type: str = Field(default="local", alias="STORAGE_TYPE")
     storage_local_path: str = Field(default="/app/storage", alias="STORAGE_LOCAL_PATH")
     storage_max_upload_mb: int = Field(default=50, alias="STORAGE_MAX_UPLOAD_MB")

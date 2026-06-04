@@ -14,10 +14,18 @@ from app.infrastructure.pdf.generic_bl_extractor import GenericBlExtractor
 
 
 class FakeInboxStorage(InboxStorage):
-    """In-memory inbox with preset PDF files."""
+    """In-memory inbox with preset PDF files on disk (for list/stat)."""
 
-    def __init__(self, files: dict[str, bytes] | None = None) -> None:
+    def __init__(
+        self,
+        files: dict[str, bytes] | None = None,
+        base_dir: Path | None = None,
+    ) -> None:
         self._files = files or {"test.pdf": b"%PDF-1.4 fake"}
+        self._base = base_dir or Path("/tmp/naviera-test-inbox")
+        self._base.mkdir(parents=True, exist_ok=True)
+        for name, content in self._files.items():
+            (self._base / name).write_bytes(content)
 
     def list_pdfs(self) -> list[str]:
         return list(self._files.keys())
@@ -27,7 +35,7 @@ class FakeInboxStorage(InboxStorage):
 
         if filename not in self._files:
             raise InboxFileNotFoundError(filename)
-        return Path(f"/fake/inbox/{filename}")
+        return self._base / filename
 
     def read_bytes(self, filename: str) -> bytes:
         from app.domain.exceptions import InboxFileNotFoundError
@@ -84,6 +92,7 @@ class FakeNotifier(Notifier):
         subject: str,
         body: str,
         *,
+        html_body: str | None = None,
         attachment_path: Path | None = None,
         shipment_id: UUID | None = None,
     ) -> None:
@@ -91,6 +100,8 @@ class FakeNotifier(Notifier):
             {
                 "email": recipient_email,
                 "subject": subject,
+                "body": body,
+                "html_body": html_body,
                 "shipment_id": shipment_id,
             }
         )

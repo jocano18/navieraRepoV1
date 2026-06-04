@@ -13,6 +13,7 @@ from app.infrastructure.persistence.session import get_session_factory, init_db
 from app.interfaces.api.exception_handlers import register_exception_handlers
 from app.interfaces.api.routers.health import router as health_router
 from app.interfaces.api.routers.inbox import router as inbox_router
+from app.interfaces.api.routers.public import router as public_router
 from app.interfaces.api.routers.shipments import router as shipments_router
 
 logging.basicConfig(
@@ -56,6 +57,7 @@ def create_app() -> FastAPI:
     application.include_router(health_router)
     application.include_router(inbox_router)
     application.include_router(shipments_router)
+    application.include_router(public_router)
 
     return application
 
